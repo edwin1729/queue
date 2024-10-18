@@ -31,10 +31,6 @@ class Queue<T> : SynchronizedObject() {
         }
     }
 
-    fun size(): Int {
-        return size.value
-    }
-
     // precondition: size > 0 and synchronization for size == 1
     private fun unsafeDequeue(): T {
         size.decrementAndGet()
@@ -43,17 +39,13 @@ class Queue<T> : SynchronizedObject() {
         return ret
     }
 
-    fun dequeue(): T? {
-        if (size.value == 0) {
-            return null
+    fun dequeue(): T? = when (size.value) {
+        0 -> null
+        1 -> synchronized(this) {
+            return@synchronized unsafeDequeue()
         }
-
-        return if (size.value == 1) {
-            synchronized(this) {
-                return@synchronized unsafeDequeue()
-            }
-        } else {
-            unsafeDequeue()
-        }
+        else -> unsafeDequeue()
     }
+
+    fun size(): Int = size.value
 }
