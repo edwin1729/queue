@@ -1,12 +1,10 @@
 package org.example
 
-import org.jetbrains.kotlinx.lincheck.*
-import org.jetbrains.kotlinx.lincheck.annotations.*
-import org.jetbrains.kotlinx.lincheck.strategy.managed.modelchecking.*
+import org.jetbrains.kotlinx.lincheck.annotations.Operation
+import org.jetbrains.kotlinx.lincheck.check
+import org.jetbrains.kotlinx.lincheck.strategy.managed.modelchecking.ModelCheckingOptions
 import org.jetbrains.kotlinx.lincheck.strategy.stress.StressOptions
-import org.junit.*
 import org.junit.jupiter.api.Test
-import java.util.concurrent.*
 
 class QueueTest {
     private val queue = Queue<Int>()
@@ -17,11 +15,12 @@ class QueueTest {
     @Operation(nonParallelGroup = "consumers")
     fun dequeue() = queue.dequeue()
 
-    // Run Lincheck in the model checking testing mode
+    @Operation
+    fun size() = queue.size()
+
     @Test
     fun modelCheckingTest() = ModelCheckingOptions().check(this::class)
 
-    // Run Lincheck in the stress testing mode
     @Test
     fun stressTest(): Unit = StressOptions().check(this::class)
 }
